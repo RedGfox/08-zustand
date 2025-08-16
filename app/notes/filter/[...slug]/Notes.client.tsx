@@ -6,6 +6,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { Toaster } from 'react-hot-toast';
+import Link from 'next/link';
 
 import { Note } from '@/types/note';
 import Pagination from '@/components/Pagination/Pagination';
@@ -13,8 +14,8 @@ import Loader from '@/components/Loader/Loader';
 import { ErrorMessage } from '@/components/ErrorMessage/ErrorMessage';
 import { ErrorMessageEmpty } from '@/components/ErrorMessageEmpty/ErrorMessageEmpty';
 import NoteList from '@/components/NoteList/NoteList';
-import { Modal } from '@/components/Modal/Modal';
-import { NoteForm } from '@/components/NoteForm/NoteForm';
+// import { Modal } from '@/components/Modal/Modal';
+// import { NoteForm } from '@/components/NoteForm/NoteForm';
 import { fetchNotes } from '@/lib/api';
 import { SearchBox } from '@/components/SearchBox/SearchBox';
 
@@ -34,7 +35,7 @@ export default function NotesClient({
 }: NotesClientProps) {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  // const [isOpenModal, setIsOpenModal] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -56,11 +57,11 @@ export default function NotesClient({
 
   const totalPages = data?.totalPages ?? 0;
 
-  const handleCreateNote = () => {
-    setIsOpenModal(true);
-  };
+  // const handleCreateNote = () => {
+  //   setIsOpenModal(true);
+  // };
 
-  const handleCloseModal = () => setIsOpenModal(false);
+  // const handleCloseModal = () => setIsOpenModal(false);
 
   const handleChange = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
@@ -77,20 +78,20 @@ export default function NotesClient({
             onChange={setCurrentPage}
           />
         )}
-        <button onClick={handleCreateNote} className={css.button}>
+        <Link href="/notes/action/create" className={css.button}>
           Create note +
-        </button>
+        </Link>
       </div>
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
       <Toaster position="top-right" />
       {isSuccess && data?.notes.length === 0 && <ErrorMessageEmpty />}
       {isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
-      {isOpenModal && (
+      {/* {isOpenModal && (
         <Modal onClose={handleCloseModal}>
           <NoteForm onClose={handleCloseModal} />
         </Modal>
-      )}
+      )} */}
     </div>
   );
 }
