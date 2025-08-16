@@ -8,6 +8,12 @@ import toast from 'react-hot-toast';
 import css from './NoteForm.module.css';
 import { useNoteStore } from '@/lib/store/noteStore';
 import { useRouter } from 'next/navigation';
+import { Note } from '@/types/note';
+
+interface NotesQueryData {
+  notes: Note[];
+  totalPages: number;
+}
 
 export function NoteForm() {
   const fieldId = useId();
@@ -15,10 +21,26 @@ export function NoteForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { draft, setDraft, clearDraft } = useNoteStore();
   const router = useRouter();
+
   const mutation = useMutation({
     mutationFn: createNote,
     onSuccess: data => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      queryClient.setQueryData<NotesQueryData>(
+        ['notes', 'All', '', 1],
+        oldData => {
+          if (!oldData) return oldData;
+          return { ...oldData, notes: [data, ...oldData.notes] };
+        }
+      );
+      queryClient.setQueryData<NotesQueryData>(
+        ['notes', data.tag, '', 1],
+        oldData => {
+          if (!oldData) return oldData;
+          return { ...oldData, notes: [data, ...oldData.notes] };
+        }
+      );
+
+      queryClient.invalidateQueries({ queryKey: ['notes'], exact: false });
       toast.success(`Note "${data.title}" created.`);
       clearDraft();
       router.push('/notes/filter/All');
